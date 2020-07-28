@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RoniTest.Data;
 using RoniTest.Models;
 
@@ -13,10 +14,15 @@ namespace RoniTest.Controllers
     public class JobsController : Controller
     {
         private readonly TestDbContext _context;
+        private readonly ILogger<JobsController> _logger;
 
-        public JobsController(TestDbContext context)
+        public JobsController(
+            TestDbContext context,
+            ILogger<JobsController> logger
+        )
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Jobs
@@ -151,13 +157,26 @@ namespace RoniTest.Controllers
         [HttpPost, ActionName("MarkAsComplete")]
         public async Task<IActionResult> MarkAsComplete(Guid? id)
         {
-            var job = await _context.Jobs.FindAsync(id);
-            job.Status = "Complete";
-            _context.Update(job);
-            await _context.SaveChangesAsync();
-            return new JsonResult(new {
-                status = "success"
-            });
+            try
+            {
+                var job = await _context.Jobs.FindAsync(id);
+                job.Status = "Complete";
+                _context.Update(job);
+                await _context.SaveChangesAsync();
+                return new JsonResult(new
+                {
+                    status = "success"
+                });
+            }
+            catch (DbUpdateException e)
+            {
+                _logger.LogError(e.Message);
+
+                return new JsonResult(new
+                {
+                    status = "fail"
+                });
+            }
         }
 
         private bool JobExists(Guid id)

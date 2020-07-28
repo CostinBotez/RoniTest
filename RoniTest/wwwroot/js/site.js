@@ -15,9 +15,13 @@ $('.mark-as-complete').click(function () {
         data: {
             id: jobId
         },
-        success: function () {
-            markAction.remove();
-            jobRow.attr('class', 'table-success');
+        success: function (response) {
+            if (repsonse.status == 'success') {
+                markAction.remove();
+                jobRow.attr('class', 'table-success');
+            } else {
+                alert('Fail');
+            }
         }
     })
 
