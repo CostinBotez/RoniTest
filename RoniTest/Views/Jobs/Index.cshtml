@@ -1,0 +1,67 @@
+﻿@model IEnumerable<RoniTest.Models.Job>
+
+@{
+    ViewData["Title"] = "Index";
+    var statusColors = new Dictionary<string, string>()
+    {
+        { "Not Started", "table-warning" },
+        { "In Progress", "table-info" },
+        { "Complete", "table-success" },
+        { "Delayed", "table-danger" }
+    };
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Floor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RoomType.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr class="@statusColors[item.Status]">
+            <td>
+                @Html.DisplayFor(modelItem => item.ID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Floor)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoomType.Name)
+            </td>
+            <td>
+                @if (item.Status == "In Progress" || item.Status == "Delayed")
+                {
+                    <button class="btn btn-success mark-as-complete" data-job-id="@item.ID">Mark as Complete</button>
+                }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
